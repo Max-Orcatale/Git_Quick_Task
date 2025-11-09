@@ -1,0 +1,184 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>    
+#include <windows.h>  
+#include <time.h>
+#define LENGTH 30
+typedef struct SnakeBody{
+	int x;
+	int y;
+	struct SnakeBody *next;
+} SnakeBody;
+
+typedef struct{
+	SnakeBody *head;
+	SnakeBody *tail;
+	int len;
+} Snake;
+
+int map[LENGTH+2][LENGTH+2];//地图为32*32坐标系，每个位置0代表空，1代表蛇头，2代表蛇体，3代表食物，-1代表边框
+
+void initialize(Snake *snake);
+char get_direction(void);
+void draw(void);
+void move_snake(Snake *snake,char direction);
+int check_collusion_or_eat(Snake* snake,char direction);
+void gameover(Snake *snake);
+void place_food(void);
+void free_snake(Snake *snake);
+
+int main(void)
+{
+	Snake *snake=(Snake*)malloc(sizeof(Snake));
+	initialize(snake);
+	draw();
+	while(1){
+		char drc=get_direction();
+		move_snake(snake,drc);
+		draw();
+		Sleep(1000);
+	}
+	return 0;
+}
+
+void initialize(Snake *snake)
+{
+	//初始化蛇
+	int head_x=rand()%LENGTH+1;
+	int head_y=rand()%LENGTH+1;
+	snake->head=(SnakeBody*)malloc(sizeof(SnakeBody));
+	snake->head->x=head_x;
+	snake->head->y=head_y;
+	snake->head->next=NULL;
+	snake->tail=snake->head;
+	snake->len=1;
+	//初始化地图
+	int i,j;
+	for(i=0;i<LENGTH+2;i++){
+		for(j=0;j<LENGTH+2;j++){
+			if(i==0||i==LENGTH+1||j==0||j==LENGTH+1){
+				map[i][j]=-1;
+			}else{
+			    map[i][j]=0;
+			}
+		}
+	}
+	map[head_y][head_x]=1;
+	map[rand()%LENGTH+1][rand()%LENGTH+1]=3;
+}
+
+char get_direction(void)
+{
+	char drc='U';
+	if(_kbhit()==1){
+		char key=_getch();
+		switch(key){
+			case 'w':drc='U';break;
+			case 'a':drc='L';break;
+			case 'd':drc='R';break;
+			case 's':drc='D';break;
+		}
+	}
+	return drc;
+}
+
+void move_snake(Snake *snake,char direction)
+{
+	SnakeBody *new_head=(SnakeBody*)malloc(sizeof(SnakeBody));
+	map[snake->head->y][snake->head->x]=2;
+	int new_x=snake->head->x;
+	int new_y=snake->head->y;
+	switch(direction){
+		case 'U':new_y--;break;
+		case 'L':new_x--;break;
+		case 'R':new_x++;break;
+		case 'D':new_y++;break;
+	}
+	new_head->x=new_x;
+	new_head->y=new_y;
+	new_head->next=snake->head;
+	snake->head=new_head;
+	
+	if(check_collusion_or_eat(snake,direction)){
+		snake->len++;
+		place_food();
+	}else{
+		map[snake->tail->y][snake->tail->x]=0;
+		SnakeBody *p=snake->head;
+		free(snake->tail);
+		while(p->next!=snake->tail){
+			p=p->next;
+		}
+		snake->tail=p;
+		snake->tail->next=NULL;
+	}
+	map[new_y][new_x]=1;
+}
+
+void place_food(void)
+{
+	int food_x,food_y;
+	do{
+		food_x=rand()%LENGTH+1;
+		food_y=rand()%LENGTH+1;
+	}while(map[food_y][food_x]!=0);
+	map[food_y][food_x]=3;
+}
+
+void draw(void)
+{
+	system("cls");
+	int i,j;
+	for(i=0;i<LENGTH+2;i++){
+		for(j=0;j<LENGTH+2;j++){
+			switch (map[i][j]){
+				case -1: printf("#"); break;
+				case 0: printf(" "); break;
+				case 1: printf("@"); break;
+				case 2: printf("+"); break;
+				case 3: printf("F"); break;
+			}
+		}
+		printf("\n");
+	}
+}
+
+int check_collusion_or_eat(Snake* snake,char direction)//返回1则说明要增长
+{
+	int eat=0;
+	int new_x=snake->head->x;
+	int new_y=snake->head->y;
+	switch(direction){
+		case 'U':new_y--;break;
+		case 'L':new_x--;break;
+		case 'R':new_x++;break;
+		case 'D':new_y++;break;
+	}
+	if(map[new_y][new_x]==-1||map[new_y][new_x]==2){
+		gameover(snake);
+	}else if(map[new_y][new_x]==3){
+		(snake->len)++;
+		eat=1;
+	}
+	return eat;
+}
+
+
+
+void gameover(Snake *snake)
+{
+	printf("/n GameOver!");
+	free_snake(snake);
+	exit(0);
+}
+
+void free_snake(Snake *snake)
+{
+	SnakeBody *current=snake->head;
+	while(current!=NULL){
+		SnakeBody *next=current->next;
+		free(current);
+		current=next;
+	}
+	free(snake);
+}
