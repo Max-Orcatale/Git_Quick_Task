@@ -16,13 +16,14 @@ typedef struct{
 	int len;
 } Snake;
 
-int map[LENGTH+2][LENGTH+2];//地图为32*32坐标系，每个位置0代表空，1代表蛇头，2代表蛇体，3代表食物，-1代表边框
+int map[LENGTH+2][LENGTH+2];//地图为32*32坐标系，每个位置0代表空，1代表蛇头，2代表蛇体，3代表食物，-1代表边框、
+char cur_direction='R';
 
 void initialize(Snake *snake);
-char get_direction(void);
+void get_direction(void);
 void draw(void);
-void move_snake(Snake *snake,char direction);
-int check_collusion_or_eat(Snake* snake,char direction);
+void move_snake(Snake *snake);
+int check_collusion_or_eat(Snake* snake);
 void gameover(Snake *snake);
 void place_food(void);
 void free_snake(Snake *snake);
@@ -33,8 +34,8 @@ int main(void)
 	initialize(snake);
 	draw();
 	while(1){
-		char drc=get_direction();
-		move_snake(snake,drc);
+		get_direction();
+		move_snake(snake);
 		draw();
 		Sleep(1000);
 	}
@@ -67,9 +68,9 @@ void initialize(Snake *snake)
 	map[rand()%LENGTH+1][rand()%LENGTH+1]=3;
 }
 
-char get_direction(void)
+void get_direction(void)
 {
-	char drc='U';
+	char drc=cur_direction;
 	if(_kbhit()==1){
 		char key=_getch();
 		switch(key){
@@ -79,16 +80,16 @@ char get_direction(void)
 			case 's':drc='D';break;
 		}
 	}
-	return drc;
+	cur_direction=drc;
 }
 
-void move_snake(Snake *snake,char direction)
+void move_snake(Snake *snake)
 {
 	SnakeBody *new_head=(SnakeBody*)malloc(sizeof(SnakeBody));
 	map[snake->head->y][snake->head->x]=2;
 	int new_x=snake->head->x;
 	int new_y=snake->head->y;
-	switch(direction){
+	switch(cur_direction){
 		case 'U':new_y--;break;
 		case 'L':new_x--;break;
 		case 'R':new_x++;break;
@@ -99,7 +100,7 @@ void move_snake(Snake *snake,char direction)
 	new_head->next=snake->head;
 	snake->head=new_head;
 	
-	if(check_collusion_or_eat(snake,direction)){
+	if(check_collusion_or_eat(snake)){
 		snake->len++;
 		place_food();
 	}else{
@@ -143,12 +144,12 @@ void draw(void)
 	}
 }
 
-int check_collusion_or_eat(Snake* snake,char direction)//返回1则说明要增长
+int check_collusion_or_eat(Snake* snake)//返回1则说明要增长
 {
 	int eat=0;
 	int new_x=snake->head->x;
 	int new_y=snake->head->y;
-	switch(direction){
+	switch(cur_direction){
 		case 'U':new_y--;break;
 		case 'L':new_x--;break;
 		case 'R':new_x++;break;
