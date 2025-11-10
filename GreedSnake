@@ -7,7 +7,7 @@
 
 void cursor_gotoxy(int x,int y)
 {
-	printf("\033[%d;%dH", y, x); //转义序列实现光标移动
+	printf("\033[%d;%dH", y+1, x+1); //转义序列实现光标移动
 }
 
 
@@ -71,6 +71,7 @@ void initialize(Snake *snake)
 	snake->len=1;
 	//初始化地图
 	int i,j;
+	cursor_gotoxy(0,0);
 	for(i=0;i<LENGTH+2;i++){
 		for(j=0;j<LENGTH+2;j++){
 			if(i==0||i==LENGTH+1||j==0||j==LENGTH+1){
@@ -81,9 +82,9 @@ void initialize(Snake *snake)
 		}
 	}
 	system("cls");
-	cursor_gotoxy(0,0);
 	for(i=0;i<LENGTH+2;i++){
 		for(j=0;j<LENGTH+2;j++){
+			cursor_gotoxy(j,i);
 			switch (map[i][j]){
 				case -1: printf("#"); break;
 				case 0: printf(" "); break;
@@ -91,9 +92,9 @@ void initialize(Snake *snake)
 				case 3: printf("F"); break;
 			}
 		}
-		printf("\n");
 	}
 	map[head_y][head_x]=1;
+	printf("\nUse w,a,s,d to change direction");
 	place_food();
 }
 
@@ -181,7 +182,7 @@ int check_collusion_or_eat(int new_x,int new_y,Snake *snake)//返回1则说明�
 
 void gameover(Snake *snake)
 {
-	cursor_gotoxy(0,LENGTH+2);
+	cursor_gotoxy(0,LENGTH+4);
 	printf("\n GameOver!");
 	free_snake(snake);
 	exit(0);
