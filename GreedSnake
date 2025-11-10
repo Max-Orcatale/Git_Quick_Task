@@ -1,9 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>    
-#include <windows.h>  
+#include <conio.h>    // 用于检测键盘输入，这是Windows特有的库
+#include <windows.h>  // 用于控制台操作和延时，Windows特有库
 #include <time.h>
 #define LENGTH 30
+
+void cursor_gotoxy(int x,int y)
+{
+	printf("\033[%d;%dH", y, x); //转义序列实现光标移动
+}
+
+
+
+
 typedef struct SnakeBody{
 	int x;
 	int y;
@@ -21,7 +30,6 @@ char cur_direction='R';
 
 void initialize(Snake *snake);
 void get_direction(void);
-void draw(void);
 void move_snake(Snake *snake);
 int check_collusion_or_eat(int new_x,int new_y,Snake *snake);
 void gameover(Snake *snake);
@@ -34,18 +42,16 @@ int main(void)
 	char diff = 'r';
 	srand((unsigned int)time(NULL));
 	Snake *snake=(Snake*)malloc(sizeof(Snake));
-	initialize(snake);
 	printf("Select Diffculy:\nEnter 'h' for Hard, 'n' for Normal, 'r' for Rookie");
 	diff=getchar();
+	initialize(snake);
 	switch(diff){
 		case 'n': sleeptime=600;break;
 		case 'h': sleeptime=200;break;
 	}
-	draw();
 	while(1){
 		get_direction();
 		move_snake(snake);
-		draw();
 		Sleep(sleeptime);
 	}
 	return 0;
@@ -53,6 +59,7 @@ int main(void)
 
 void initialize(Snake *snake)
 {
+	printf("\033[?25l");
 	//初始化蛇
 	int head_x=rand()%LENGTH+1;
 	int head_y=rand()%LENGTH+1;
@@ -73,6 +80,19 @@ void initialize(Snake *snake)
 			}
 		}
 	}
+	system("cls");
+	cursor_gotoxy(0,0);
+	for(i=0;i<LENGTH+2;i++){
+		for(j=0;j<LENGTH+2;j++){
+			switch (map[i][j]){
+				case -1: printf("#"); break;
+				case 0: printf(" "); break;
+				case 1: printf("@"); break;
+				case 3: printf("F"); break;
+			}
+		}
+		printf("\n");
+	}
 	map[head_y][head_x]=1;
 	place_food();
 }
@@ -92,10 +112,13 @@ void get_direction(void)
 	cur_direction=drc;
 }
 
+
 void move_snake(Snake *snake)
 {
 	SnakeBody *new_head=(SnakeBody*)malloc(sizeof(SnakeBody));
 	map[snake->head->y][snake->head->x]=2;
+	cursor_gotoxy(snake->head->x,snake->head->y);
+	printf("+");
 	int new_x=snake->head->x;
 	int new_y=snake->head->y;
 	switch(cur_direction){
@@ -114,6 +137,8 @@ void move_snake(Snake *snake)
 		place_food();
 	}else{
 		map[snake->tail->y][snake->tail->x]=0;
+		cursor_gotoxy(snake->tail->x,snake->tail->y);
+		printf(" ");
 		SnakeBody *p=snake->head;
 		free(snake->tail);
 		while(p->next!=snake->tail){
@@ -123,6 +148,8 @@ void move_snake(Snake *snake)
 		snake->tail->next=NULL;
 	}
 	map[new_y][new_x]=1;
+	cursor_gotoxy(new_x,new_y);
+	printf("@");
 }
 
 void place_food(void)
@@ -133,25 +160,10 @@ void place_food(void)
 		food_y=rand()%LENGTH+1;
 	}while(map[food_y][food_x]!=0);
 	map[food_y][food_x]=3;
+	cursor_gotoxy(food_x,food_y);
+	printf("F");
 }
 
-void draw(void)
-{
-	system("cls");
-	int i,j;
-	for(i=0;i<LENGTH+2;i++){
-		for(j=0;j<LENGTH+2;j++){
-			switch (map[i][j]){
-				case -1: printf("#"); break;
-				case 0: printf(" "); break;
-				case 1: printf("@"); break;
-				case 2: printf("+"); break;
-				case 3: printf("F"); break;
-			}
-		}
-		printf("\n");
-	}
-}
 
 int check_collusion_or_eat(int new_x,int new_y,Snake *snake)//返回1则说明要增长
 {
@@ -169,6 +181,7 @@ int check_collusion_or_eat(int new_x,int new_y,Snake *snake)//返回1则说明�
 
 void gameover(Snake *snake)
 {
+	cursor_gotoxy(0,LENGTH+2);
 	printf("\n GameOver!");
 	free_snake(snake);
 	exit(0);
@@ -184,3 +197,10 @@ void free_snake(Snake *snake)
 	}
 	free(snake);
 }
+
+
+
+
+
+
+
