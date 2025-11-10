@@ -23,7 +23,7 @@ void initialize(Snake *snake);
 void get_direction(void);
 void draw(void);
 void move_snake(Snake *snake);
-int check_collusion_or_eat(Snake* snake);
+int check_collusion_or_eat(int new_x,int new_y,Snake *snake);
 void gameover(Snake *snake);
 void place_food(void);
 void free_snake(Snake *snake);
@@ -100,7 +100,7 @@ void move_snake(Snake *snake)
 	new_head->next=snake->head;
 	snake->head=new_head;
 	
-	if(check_collusion_or_eat(snake)){
+	if(check_collusion_or_eat(new_x,new_y,snake)){
 		snake->len++;
 		place_food();
 	}else{
@@ -144,17 +144,9 @@ void draw(void)
 	}
 }
 
-int check_collusion_or_eat(Snake* snake)//返回1则说明要增长
+int check_collusion_or_eat(int new_x,int new_y,Snake *snake)//返回1则说明要增长
 {
 	int eat=0;
-	int new_x=snake->head->x;
-	int new_y=snake->head->y;
-	switch(cur_direction){
-		case 'U':new_y--;break;
-		case 'L':new_x--;break;
-		case 'R':new_x++;break;
-		case 'D':new_y++;break;
-	}
 	if(map[new_y][new_x]==-1||map[new_y][new_x]==2){
 		gameover(snake);
 	}else if(map[new_y][new_x]==3){
