@@ -30,15 +30,23 @@ void free_snake(Snake *snake);
 
 int main(void)
 {
+	int sleeptime=1000;
+	char diff = 'r';
 	srand((unsigned int)time(NULL));
 	Snake *snake=(Snake*)malloc(sizeof(Snake));
 	initialize(snake);
+	printf("Select Diffculy:\nEnter 'h' for Hard, 'n' for Normal, 'r' for Rookie");
+	diff=getchar();
+	switch(diff){
+		case 'n': sleeptime=600;break;
+		case 'h': sleeptime=200;break;
+	}
 	draw();
 	while(1){
 		get_direction();
 		move_snake(snake);
 		draw();
-		Sleep(1000);
+		Sleep(sleeptime);
 	}
 	return 0;
 }
@@ -66,7 +74,7 @@ void initialize(Snake *snake)
 		}
 	}
 	map[head_y][head_x]=1;
-	map[rand()%LENGTH+1][rand()%LENGTH+1]=3;
+	place_food();
 }
 
 void get_direction(void)
