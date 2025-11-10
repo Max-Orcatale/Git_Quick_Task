@@ -1,0 +1,88 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{ctex}   %中文
+\usepackage{amsthm}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 贪吃蛇开发报告}
+\fancyhead[R]{\small \today}
+\fancyfoot[C]{\thepage\ / \pageref{LastPage}}
+
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!5},
+    frame=single,
+    breaklines=true,
+    postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    captionpos=b
+}
+
+
+
+\title{LaTex笔记}
+\author{Yicheng Li}
+\date{September 2025}
+
+
+
+
+
+\begin{document}
+
+
+\maketitle
+% 项目简介
+\section{项目简介}
+这是一个简单的贪吃蛇C程序代码。界面上用@代表蛇头，用+代表蛇身。玩家用wasd键控制蛇的移动方向，吃到食物时
+蛇的长度会增加。游戏结束条件是蛇撞到自己或墙壁。
+
+特别地，我添加了简单的难度系统并实现了平滑的移动。
+
+% AI提示记录
+\section{AI提示记录}
+以下是开发过程中使用的所有AI提示列表：
+
+\begin{lstlisting}[caption=AI提示记录]
+1. 我是一名c语言新手，正在写贪吃蛇，以下是我的代码。现在发现两个问题：
+    (1).未按键时，贪吃蛇默认往上走；
+    (2).某种情况下，贪吃蛇吃到食物后身体不加长。
+   请你提出修改意见，并解释为什么这样修改。
+   
+2.这是我现在的代码。现在我发现虽然我用了rand（）函数，
+  可是每局游戏开始蛇的位置和食物的位置都是固定的，不随机，这是什么原因？怎么解决？
+  
+3.每次都重新刷新页面给人的观感不好。如何使用转义序列来实现光标移动打印？
+  对我的代码做出尽量小的改动
+  
+4.现在发现了一个问题，s实际框的范围要比打印出来的“#”框往下了两格。
+  为什么？请修改
+\end{lstlisting}
+
+% Git提交记录
+\section{Git提交记录}
+项目最近的提交记录如下：
+\begin{lstlisting}[caption=Git提交记录]
+cbaa2c0 (HEAD -> Report, main, code) Add a tip
+f22f7f4 Improve the screen display
+e74acf9 Add a difficulty system
+1c37132 Improve gameplay experience
+6d460b2 Fix the snake growth bug
+
+
+
+\end{lstlisting}
+
+
+
+
+\end{document}
