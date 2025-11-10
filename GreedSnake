@@ -30,6 +30,7 @@ void free_snake(Snake *snake);
 
 int main(void)
 {
+	srand((unsigned int)time(NULL));
 	Snake *snake=(Snake*)malloc(sizeof(Snake));
 	initialize(snake);
 	draw();
@@ -160,7 +161,7 @@ int check_collusion_or_eat(int new_x,int new_y,Snake *snake)//返回1则说明�
 
 void gameover(Snake *snake)
 {
-	printf("/n GameOver!");
+	printf("\n GameOver!");
 	free_snake(snake);
 	exit(0);
 }
